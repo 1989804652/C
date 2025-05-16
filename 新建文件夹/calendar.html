@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线日历查询器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .calendar-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-day {
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 60px;
+        }
+        .other-month {
+            color: #ccc;
+        }
+        .today {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>在线日历查询器</h1>
+    
+    <div class="calendar-controls">
+        <input type="number" id="yearInput" min="1900" max="2100" placeholder="年份">
+        <input type="number" id="monthInput" min="1" max="12" placeholder="月份">
+        <button onclick="generateCalendar()">查询</button>
+    </div>
+    
+    <div id="calendarTitle"></div>
+    
+    <div class="calendar-header">
+        <div>日</div>
+        <div>一</div>
+        <div>二</div>
+        <div>三</div>
+        <div>四</div>
+        <div>五</div>
+        <div>六</div>
+    </div>
+    
+    <div class="calendar-grid" id="calendarGrid"></div>
+
+    <script>
+        function generateCalendar() {
+            const year = parseInt(document.getElementById('yearInput').value) || new Date().getFullYear();
+            const month = parseInt(document.getElementById('monthInput').value) || new Date().getMonth() + 1;
+            
+            const date = new Date(year, month - 1, 1);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const firstDayOfWeek = date.getDay();
+            
+            document.getElementById('calendarTitle').textContent = `${year}年${month}月`;
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // 填充上个月的日期
+            const prevMonthDays = new Date(year, month - 1, 0).getDate();
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = prevMonthDays - firstDayOfWeek + i + 1;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // 填充当前月的日期
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                if (year === today.getFullYear() && month === today.getMonth() + 1 && i === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                dayElement.textContent = i;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // 填充下个月的日期
+            const totalCells = Math.ceil((firstDayOfWeek + daysInMonth) / 7) * 7;
+            const nextMonthDays = totalCells - (firstDayOfWeek + daysInMonth);
+            for (let i = 1; i <= nextMonthDays; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = i;
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+        
+        // 默认显示当前月份
+        window.onload = function() {
+            const today = new Date();
+            document.getElementById('yearInput').value = today.getFullYear();
+            document.getElementById('monthInput').value = today.getMonth() + 1;
+            generateCalendar();
+        };
+    </script>
+</body>
+</html>
